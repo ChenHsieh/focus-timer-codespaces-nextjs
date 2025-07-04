@@ -12,30 +12,35 @@ function Home() {
 
   // Load saved data from localStorage on component mount
   useEffect(() => {
-    const savedTotalSessions = localStorage.getItem('timerTotalSessions')
-    const savedDate = localStorage.getItem('timerLastDate')
-    const savedTodaySessions = localStorage.getItem('timerTodaySessions')
-    const today = new Date().toDateString()
+    // Check if we're in the browser (not server-side rendering)
+    if (typeof window !== 'undefined') {
+      const savedTotalSessions = localStorage.getItem('timerTotalSessions')
+      const savedDate = localStorage.getItem('timerLastDate')
+      const savedTodaySessions = localStorage.getItem('timerTodaySessions')
+      const today = new Date().toDateString()
 
-    if (savedTotalSessions) {
-      setTotalSessions(parseInt(savedTotalSessions, 10))
-    }
+      if (savedTotalSessions) {
+        setTotalSessions(parseInt(savedTotalSessions, 10))
+      }
 
-    // Reset today's count if it's a new day
-    if (savedDate === today && savedTodaySessions) {
-      setTodaySessions(parseInt(savedTodaySessions, 10))
-    } else {
-      setTodaySessions(0)
-      localStorage.setItem('timerLastDate', today)
-      localStorage.setItem('timerTodaySessions', '0')
+      // Reset today's count if it's a new day
+      if (savedDate === today && savedTodaySessions) {
+        setTodaySessions(parseInt(savedTodaySessions, 10))
+      } else {
+        setTodaySessions(0)
+        localStorage.setItem('timerLastDate', today)
+        localStorage.setItem('timerTodaySessions', '0')
+      }
     }
   }, [])
 
   // Save to localStorage whenever sessions change
   const saveSessionData = useCallback((newTotal, newToday) => {
-    localStorage.setItem('timerTotalSessions', newTotal.toString())
-    localStorage.setItem('timerTodaySessions', newToday.toString())
-    localStorage.setItem('timerLastDate', new Date().toDateString())
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('timerTotalSessions', newTotal.toString())
+      localStorage.setItem('timerTodaySessions', newToday.toString())
+      localStorage.setItem('timerLastDate', new Date().toDateString())
+    }
   }, [])
 
   const formatTime = (seconds) => {
@@ -110,9 +115,11 @@ function Home() {
     setCompletedSessions(0)
     setTotalSessions(0)
     setTodaySessions(0)
-    localStorage.removeItem('timerTotalSessions')
-    localStorage.removeItem('timerTodaySessions')
-    localStorage.removeItem('timerLastDate')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('timerTotalSessions')
+      localStorage.removeItem('timerTodaySessions')
+      localStorage.removeItem('timerLastDate')
+    }
   }, [])
 
   return (
